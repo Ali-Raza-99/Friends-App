@@ -1,102 +1,185 @@
 import { useState, useEffect, useContext } from 'react'
 import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
-import CardActionArea from '@mui/material/CardActionArea';
+import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
-import Input from '@mui/material/Input';
-import FilledInput from '@mui/material/FilledInput';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormHelperText from '@mui/material/FormHelperText';
-import FormControl from '@mui/material/FormControl';
-// import TextField from '@mui/material/TextField';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Grid from '@mui/material/Grid';
 import '../App.css'
+import { styled } from '@mui/material/styles';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
-import InputField from './InputField';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import { NavLink } from 'react-router-dom';
-import { getAuth,createUserWithEmailAndPassword  } from "firebase/auth";
+import { NavLink,Navigate, useNavigate } from 'react-router-dom';
+import { getAuth,createUserWithEmailAndPassword ,updateProfile } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, addDoc, getDocs, serverTimestamp,doc,deleteDoc,setDoc } from "firebase/firestore";
+import { Fullscreen } from '@mui/icons-material';
+import { auth } from '../firebase/firebase';
+import { storageRef,uploadBytes,storage } from '../firebase/firebase';
+// import { doCreateUserWithEmailAndPassword,createUserWithEmailAndPassword } from '../firebase/auth';
+import { db,collection,addDoc } from '../firebase/firebase';
+ import { getDownloadURL,ref } from 'firebase/storage';
+import { deleteUser } from 'firebase/auth';
+// import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD6-sjausmHzwHfAhQ9a5Klr3cb74SbfDs",
-  authDomain: "arfacebookapp.firebaseapp.com",
-  projectId: "arfacebookapp",
-  storageBucket: "arfacebookapp.appspot.com",
-  messagingSenderId: "675808701259",
-  appId: "1:675808701259:web:96e93f2f68fcdf06b296ce",
-  measurementId: "G-NPSBCG60B7"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const analytics = getAnalytics(app);
-
-
-// const auth = getAuth();
-// createUserWithEmailAndPassword(auth, email, password)
-//   .then((userCredential) => {
-    // Signed up 
-  //   const user = userCredential.user;
-  //   // ...
-  // })
-  // .catch((error) => {
-  //   const errorCode = error.code;
-  //   const errorMessage = error.message;
-  //   // ..
-  // });
-
+const currencies = [
+  {
+    value: 'Male',
+    label: 'Male',
+  },
+  {
+    value: 'Female',
+    label: 'Female',
+  },
+  {
+    value: 'Other',
+    label: 'Other',
+  },
+ 
+];
 
 function Signup() {
+
+  const navigate = useNavigate();
+  const [success,setSuccess] = useState(null)
+  const [error,setError] = useState('')
+  const [imgUrl,setImgUrl]=  useState(null)
+  const [values,setValues] = useState({
+    name:'',
+    email:'',
+    phone:'',
+    dateOfBirth:'',
+    password:'',
+    gender: '',
+    city : ''
+  })
+  const [loading, setLoading] = useState(false);
+  
+  const [buttonColor,setButtonColor] = useState('#78909c')
+  const handleSelectProfile =(event)=>{
+
+    const file = event.target.files[0];
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        setImgUrl(file);   
+        setButtonColor('#4caf50'); 
+        event.target.value = "";
+        setError(false); 
+      } else {
+        setError('Please select an image other files are not allowed');
+        setButtonColor('#78909c'); 
+      }
+    }
+  }
+  useEffect(() => {
+    if (imgUrl) {
+      setButtonColor('#4caf50'); 
+    }
+  }, [imgUrl]);
+  
+
+  const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
+
+  
+  const handleSignUp = async () => {
+
+    
+    if (!values.name || !values.email || !values.password || !values.phone || !values.dateOfBirth || !values.gender|| !values.city || !imgUrl) {
+      setError('Please ensure all input fields are completed before proceeding.');
+      setSuccess(null);
+      return; 
+    }
+  
+    try {
+    setLoading(true);  
+
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
+  
+      try {
+        const fileRef = ref(storage, `${user.uid}/profilePic/`);
+        await uploadBytes(fileRef, imgUrl);
+        const downloadURL = await getDownloadURL(fileRef);
+  
+        await updateProfile(user, { displayName: values.name, photoURL: downloadURL });
+  
+        await addDoc(collection(db, "users"), {
+          userUid: user.uid,
+          userName: values.name,
+          phone: values.phone,
+          profileUrl: downloadURL,
+          born: values.dateOfBirth,
+          city : values.city,
+          gender : values.gender
+        });
+
+        setSuccess(true);
+        navigate('/login');
+  
+      } catch (error) {
+        await deleteUser(user);
+        setError(`An error occurred while signing up : ${error.message}`);
+        setSuccess(null);
+      }
+  
+    } catch (error) {
+      setLoading(false);  
+      setError(`An error occurred while signing up : ${error.message}`);
+      setSuccess(null);
+    }
+  };
   return (
-    <div >
-      <Box className="signUpCard"
-        sx={(theme) => ({
-          
-          width: '28%',
-          height: 400,
-          p: 1,
-          my: 1,
-          bgcolor: 'grey.30',
-          color: 'grey.800',
-          padding: 2,
-          border: '1px solid',
-          borderColor: 'grey.300',
-          borderRadius: 2,
-          fontSize: '0.875rem',
-          fontWeight: '700',
-          // textAlign: 'center',
-          ...theme.applyStyles('dark', {
-            bgcolor: '#101010',
-            color: 'grey.300',
-            borderColor: 'grey.800',
-          }),
-        })}>
+    <div>
+      <Box sx={{width:"53ch",border: `1px solid  rgb(189, 188, 188)`,padding:20}} className="signUpCard">
 
         <Typography color="primary" size="large">Friends App</Typography>
         <Typography fontWeight={500} mt={3} variant='h4'>Sign Up</Typography>
-        <InputField/>
+        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} mt={2.7}>
+      <Grid item xs={6} >  <TextField onChange={(event)=> setValues((prev)=>({...prev,name:event.target.value}))}  size="small" id="outlined-basic-name" label="Name" variant="outlined" fullWidth/></Grid>
+      <Grid item xs={6} >  <TextField sx={{width:'200px'}} onChange={(event)=> setValues((prev)=>({...prev,dateOfBirth:event.target.value}))} size="small" id="outlined-basic-date"  type='date' variant="outlined" fullWidth/></Grid>
+      <Grid item xs={6} >  <TextField onChange={(event)=> setValues((prev)=>({...prev,phone:event.target.value}))} size="small" id="outlined-basic-number" label="Phone" type='number' variant="outlined" fullWidth/></Grid>
+      <Grid item xs={6} >  <TextField onChange={(event)=> setValues((prev)=>({...prev,email:event.target.value}))} size="small" id="outlined-basic-email" label="E-mail" variant="outlined" fullWidth/></Grid>
+      <Grid item xs={6} >  <TextField  onChange={(event)=> setValues((prev)=>({...prev,password:event.target.value}))} size="small" id="outlined-password-input" label="Password"type="password" autoComplete="current-password" fullWidth/></Grid>
+      <Grid item xs={6}>  <Button style={{backgroundColor:buttonColor}} component="label" sx={{height:'40px'}} fullWidth role={undefined} variant="contained" tabIndex={-1} startIcon={<CloudUploadIcon />}> Upload Profile <VisuallyHiddenInput type="file" accept="image/*"  onChange={(event)=>handleSelectProfile(event)} multiple /></Button></Grid>
+      <Grid item xs={6} >  <TextField onChange={(event)=> setValues((prev)=>({...prev,city:event.target.value}))}  size="small" id="outlined-basic-city" label="City" variant="outlined" fullWidth/></Grid>
+   <Grid item xs={6}>  
+      <TextField
+          id="outlined-select-gender"
+          select
+          size='small'
+          // label="Select"
+          defaultValue="Other"
+          fullWidth
+          onChange={(event)=> setValues((prev)=>({...prev,gender:event.target.value}))}
+          // helperText="Please select your currency"
+        >
+          {currencies.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
+        </Grid>
+      </Grid>
 
-        <Stack sx={{marginLeft:1}} spacing={20} direction="row">
-     <NavLink to={'/'}><Button style={{ padding: "11px 160px",marginTop:40 }} variant="contained">SignUp</Button></NavLink> 
-      
-      </Stack>
-      <Stack sx={{marginLeft:1}} spacing={20} direction="row">
-    <NavLink to={'/login'}> <Button  style={{ padding: "11px 153px",marginTop:10 , backgroundColor:'#424242'}} variant="contained">Login</Button></NavLink>
-      
+        <Stack  sx={{justifyContent: "center",alignItems: "center",marginTop:3}}   direction="column">
+     <LoadingButton style={{ padding: "11px 183px",marginTop:15 }} onClick={handleSignUp} loading={loading} variant="contained">  Sign Up </LoadingButton>
+        <Typography mt={2} color="error" variant='caption' size="large">{error}</Typography>
+        <Typography sx={{fontSize: '0.9rem'  }} mt={2} size="small">Already have an account click here for<NavLink to={'/login'}> Login</NavLink></Typography>
       </Stack>
 
-{/* <Typography color="primary" size="large">f</Typography> */}
 
       </Box>
 

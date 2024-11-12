@@ -1,12 +1,20 @@
-import React from 'react'
-// import Link from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Button, Typography } from '@mui/material';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from '../firebase/firebase';
+import Appbar from './Appbar';
+import CssBaseline from '@mui/material/CssBaseline';
 
-function Home() {
-  return (
-    <div>
-      this is home page
-    </div>
-  )
-}
+  function Home() {
+    return(
+      <>
+            <CssBaseline /> 
 
-export default Home
+      <Appbar/>
+      </>
+   )
+     
+   }
+  
+export default Home;

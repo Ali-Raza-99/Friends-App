@@ -1,5 +1,6 @@
-.signUpCard{
-    margin-top: 50px !important;
+.signUpCard,.loginCard{
+    margin-top: 70px !important;
     margin: auto;
     padding: 20px 15px !important;
+    /* background: color #333;; */
 }
