@@ -24,7 +24,7 @@ import { deleteUser } from 'firebase/auth';
 // import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 
-const currencies = [
+const gender = [
   {
     value: 'Male',
     label: 'Male',
@@ -165,7 +165,7 @@ function Signup() {
           onChange={(event)=> setValues((prev)=>({...prev,gender:event.target.value}))}
           // helperText="Please select your currency"
         >
-          {currencies.map((option) => (
+          {gender.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>

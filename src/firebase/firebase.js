@@ -1,9 +1,7 @@
 import { getAuth,createUserWithEmailAndPassword , } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-// import { getFirestore } from "firebase/firestore";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
-// import { collection, addDoc } from "firebase/firestore"; 
 import { getFirestore, collection, addDoc, getDocs,doc,deleteDoc,setDoc } from "firebase/firestore";
 
 const firebaseConfig = {

@@ -1,20 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Typography } from '@mui/material';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from '../firebase/firebase';
+import React, { useContext } from 'react';
+import { CssBaseline } from '@mui/material';
 import Appbar from './Appbar';
-import CssBaseline from '@mui/material/CssBaseline';
+import PostContainer from './PostContainer';
+import { FirestoreProvider } from '../context/fetchData';
+import { AuthContext } from '../context/authContext/firebaseAuth';
+import { db } from '../firebase/firebase';
+import { auth } from '../firebase/firebase';
+import { onAuthStateChanged } from "firebase/auth";
 
-  function Home() {
-    return(
-      <>
-            <CssBaseline /> 
+function Home() {
 
+  return (
+
+    <FirestoreProvider>
+      <CssBaseline />
       <Appbar/>
-      </>
-   )
-     
-   }
-  
+      
+      <PostContainer />
+    </FirestoreProvider>
+    
+  );
+}
+
 export default Home;
