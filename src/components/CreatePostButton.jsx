@@ -56,7 +56,7 @@ function CreatePostButton() {
     
     const [buttonColor,setButtonColor] = useState('#78909c')
 
-    console.log(user.uid)
+    // console.log(user.uid)
 
     const handleUploadPost = async()=>{
 

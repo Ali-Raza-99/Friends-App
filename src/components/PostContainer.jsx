@@ -14,7 +14,7 @@ export default function PostContainer() {
 
   const {user,data,loading} = useData()
   const mycard = ['raza',9  ]
-  // console.log(user)
+  console.log(user)
 
   // console.log(data.map((element,key)=>({key,element})))
   return (
