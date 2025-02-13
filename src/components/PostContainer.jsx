@@ -12,9 +12,17 @@ import CreatePostButton from "./CreatePostButton";
 export default function PostContainer() {
 
 
-  const {user,data,loading} = useData()
+  const {user,data,customLoading} = useData()
   const mycard = ['raza',9  ]
-  console.log(user)
+  //   const userId = user.uid;
+//   console.log(user)
+//   for (const [key, value] of Object.entries(user)) {
+//     if (key === "uid") {
+//         console.log(value); // Output: 'YjK5McqHp6gq5cHhPuLTuk2qVWy2'
+//     }
+// }
+
+  // console.log(userId)
 
   // console.log(data.map((element,key)=>({key,element})))
   return (

@@ -16,7 +16,7 @@ export const useData = () => useContext(DataContext);
 export const FirestoreProvider = ({ children }) => {
   const [data, setData] = useState([]);
   const [user, setUser] = useState(null); 
-  const [loading, setLoading] = useState(true);
+  const [customLoading, setCustomLoading] = useState(true);
 
   useEffect(() => {
     // Set up the listener for authentication state changes
@@ -47,11 +47,11 @@ export const FirestoreProvider = ({ children }) => {
         }));
 
         setData(fetchedData);
-        console.log(fetchedData); 
+        console.log(data); 
       } catch (error) {
         console.error('Error fetching data from Firestore:', error);
       } finally {
-        setLoading(false);
+        setCustomLoading(false);
       }
     };
 
@@ -59,7 +59,7 @@ export const FirestoreProvider = ({ children }) => {
   }, [user]);
 
   return (
-    <DataContext.Provider value={{ user,data, loading }}>
+    <DataContext.Provider value={{ user,data, customLoading }}>
       {children}
     </DataContext.Provider>
   );
