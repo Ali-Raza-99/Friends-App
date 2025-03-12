@@ -7,7 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useData } from '../context/fetchData';
 import { db, storage } from '../firebase/firebase';
 import { Padding } from '@mui/icons-material';
-
+import { auth } from '../firebase/firebase';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -31,30 +31,39 @@ const VisuallyHiddenInput = styled('input')({
   left: 0,
   whiteSpace: 'nowrap',
   width: 1,
+  
 });
 
 function CreatePostButton() {
   const { user,customLoading} = useData();
-
   const [loading, setLoading] = React.useState(false);
   
 
-  const [postData, setPostData] = useState({ title: '', discription: '', userUid: '' });
+  const [postData, setPostData] = useState({ title: '', discription: '', userUid: '',userName :'',userProfile:'' });
   const [imgUrl, setImgUrl] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(null);
   const [buttonColor, setButtonColor] = useState('#78909c');
   const [open, setOpen] = useState(false);
 
+  
   useEffect(() => {
     if (user?.uid) {
       setPostData((prevState) => ({
         ...prevState,
         userUid: user.uid,
+        userName: user.displayName,
+        userProfile: user.photoURL,
+      
       }));
+      
     }
   }, [user]);
 
+  useEffect(() => {
+  }, [postData])
+  
+  
   const handleUploadPost = async () => {
     if (!postData.title || !postData.discription || !imgUrl) {
       setError('Please ensure all input fields are completed before proceeding.');
@@ -72,6 +81,8 @@ function CreatePostButton() {
         discription: postData.discription,
         postUrl: downloadURL,
         userUid: postData.userUid,
+        userProfile: postData.userProfile,
+        userName : postData.userName,
         createdAt: new Date().toISOString()
       });
 
@@ -79,7 +90,7 @@ function CreatePostButton() {
       // setSuccess('Post uploaded successfully!');
       setError('');
       setLoading(false)
-      setPostData({ title: '', discription: '', userUid: user.uid });
+      
       setImgUrl(null);
       setButtonColor('#78909c');
       setOpen(false); 
@@ -103,6 +114,7 @@ function CreatePostButton() {
       }
     }
   };
+
 
   useEffect(() => {
     if (imgUrl) {
