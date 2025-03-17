@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Box, Modal, Typography, TextField, Paper, styled } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { collection, addDoc } from "firebase/firestore"; 
+import { collection, addDoc,serverTimestamp } from "firebase/firestore"; 
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useData } from '../context/fetchData';
 import { db, storage } from '../firebase/firebase';
@@ -83,9 +83,10 @@ function CreatePostButton() {
         userUid: postData.userUid,
         userProfile: postData.userProfile,
         userName : postData.userName,
-        createdAt: new Date().toISOString()
+        timestamp : serverTimestamp()
       });
-
+      
+      // createdAt: new Date().toISOString()
       // console.log("Document written with ID: ", docRef.id);
       // setSuccess('Post uploaded successfully!');
       setError('');

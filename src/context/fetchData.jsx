@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // import { getFirestore,collection,getDocs } from 'firebase/firestore';
-import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, query, where, onSnapshot } from 'firebase/firestore';
 
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/firebase';
@@ -15,6 +15,7 @@ export const useData = () => useContext(DataContext);
 
 export const FirestoreProvider = ({ children }) => {
   const [data, setData] = useState([]);
+  const [posts,setPosts] = useState([])
   const [user, setUser] = useState(null); 
   const [customLoading, setCustomLoading] = useState(true);
 
@@ -47,7 +48,7 @@ export const FirestoreProvider = ({ children }) => {
         }));
 
         setData(fetchedData);
-        console.log(data); 
+        // console.log(data + 'ye dekh'); 
       } catch (error) {
         console.error('Error fetching data from Firestore:', error);
       } finally {
@@ -58,8 +59,22 @@ export const FirestoreProvider = ({ children }) => {
     fetchData();
   }, [user]);
 
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db,'posts'),(snapshot)=>{
+        const postData = snapshot.docs.map((doc)=>({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        setPosts(postData)
+      
+      })
+
+    return ()=> unsubscribe();
+  }, [])
+  
+
   return (
-    <DataContext.Provider value={{ user,data, customLoading }}>
+    <DataContext.Provider value={{posts, user,data, customLoading }}>
       {children}
     </DataContext.Provider>
   );
