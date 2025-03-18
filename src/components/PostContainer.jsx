@@ -5,29 +5,39 @@ import CommentIcon from "@mui/icons-material/Comment";
 import { collection, query, where, getDocs } from "firebase/firestore";
 // import { db } from "../firebase";
 import { db } from "../firebase/firebase";
+import { doc, updateDoc } from "firebase/firestore";
 import { useData } from "../context/fetchData";
 import CreatePostButton from "./CreatePostButton";
-import { auth } from "../firebase/firebase"; 
-
+import CircularProgress from '@mui/material/CircularProgress';
+import Badge from '@mui/material/Badge';
 
 export default function PostContainer() {
-  const { user,posts,customLoading } = useData(); // Get logged-in user
-  // const [posts, setPosts] = useState([]);
+  const { user,posts,customLoading } = useData(); 
   const [loading, setLoading] = useState(true);
-  
+  const [likes,setLikes] = useState(0);
+  const [toggleLikes,setToggleLikes] = useState(false)
+
   useEffect(() => {
-    if (posts.length > 0 || posts !== undefined) {
-      setLoading(false); // Stop loading once posts are fetched
+    if (posts && posts.length > 0) {
+      setLoading(false);
+    } else if (posts && posts.length === 0) {
+      setLoading(false); 
     }
   }, [posts]);
-
   
+  // useEffect(() => {
+  //   console.log(toggleLikes)
+  // }, [toggleLikes])
+  
+  const handleLikes = (postId)=>{
+      console.log(postId) 
+  }  
 
   return (
     <>
       <Grid container sx={{ width: "100%", flexDirection: "column", minHeight: "100vh", paddingTop: 10, alignItems: "center", justifyContent: "center" }}>
         {loading ? (
-          <Typography>Loading posts...</Typography>
+          <Typography><CircularProgress /></Typography>
         ) : posts.length === 0 ? (
           <Typography>No posts found</Typography>
         ) : (
@@ -50,12 +60,16 @@ export default function PostContainer() {
                   </Box>
                 </Box>
                 <Box>
+                  <Typography sx={{ padding: 2, fontSize: "14px",fontWeight:"bold" }}>{post.title || "No content available"}</Typography>
                   <Typography sx={{ padding: 2, fontSize: "14px", color: "gray" }}>{post.discription || "No content available"}</Typography>
                 </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-around", width: "100%", padding: 2 }}>
+                <Box  sx={{ display: "flex", justifyContent: "space-around", width: "100%", padding: 2 }}>
+                        {/* <NotificationsIcon /> */}
+                     <Badge onClick={()=>handleLikes(post.id)} badgeContent={post.likes} color="error">
                   <IconButton size="small">
-                    <ThumbUpIcon fontSize="small" />
+                    <ThumbUpIcon   sx={{ color: toggleLikes ? "#1976d2" : "grey" }} fontSize="small" />
                   </IconButton>
+                      </Badge>
                   <IconButton size="small">
                     <CommentIcon fontSize="small" />
                   </IconButton>

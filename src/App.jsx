@@ -4,6 +4,7 @@ import './App.css'
 import Signup from './components/Signup'
 import Login from './components/Login';
 import Home from './components/Home';
+import Profile from './components/Profile';
 // import { useAuth } from './context';
 import { doSignInWithEmailAndPassword } from './firebase/auth';
 
@@ -29,6 +30,10 @@ function App() {
     {
       path:"/home",
       element:<Home/>,
+    },
+    {
+      path:"/Profile",
+      element:<Profile/>,
     }
   ])
 

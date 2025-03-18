@@ -6,7 +6,6 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
-import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -14,12 +13,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Avatar from '@mui/material/Avatar';
 import MailIcon from '@mui/icons-material/Mail';
+import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import HomeIcon from '@mui/icons-material/Home';
-import { useNavigate } from 'react-router-dom';
 import { useData } from '../context/fetchData'; // Importing custom hook for user data
 import { doSignOut } from '../firebase/auth'; // Importing Firebase sign-out logic
+import { NavLink,Navigate, useNavigate } from 'react-router-dom';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -61,7 +61,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function Appbar() {
+
   const navigate = useNavigate();
+  
   const { data,user, loading } = useData();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -91,6 +93,10 @@ export default function Appbar() {
     setAnchorEl(null);
     handleMobileMenuClose();
   };
+  const handleProfile = ()=>{
+      navigate('/Profile')
+
+  }
 
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
@@ -113,7 +119,7 @@ export default function Appbar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleProfile}>Profile</MenuItem>
       <MenuItem onClick={handleLogOut}>Logout</MenuItem>
     </Menu>
   );
@@ -172,8 +178,9 @@ export default function Appbar() {
             <AccountCircle />
           )}
         </IconButton>
-        <p>Profile</p>
-      </MenuItem>
+        
+        <p>Profile</p>  
+            </MenuItem>
     </Menu>
   );
 

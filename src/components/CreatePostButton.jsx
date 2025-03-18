@@ -39,7 +39,7 @@ function CreatePostButton() {
   const [loading, setLoading] = React.useState(false);
   
 
-  const [postData, setPostData] = useState({ title: '', discription: '', userUid: '',userName :'',userProfile:'' });
+  const [postData, setPostData] = useState({ title: '', discription: '', userUid: '',userName :'',userProfile:'',likes:0 });
   const [imgUrl, setImgUrl] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(null);
@@ -60,8 +60,8 @@ function CreatePostButton() {
     }
   }, [user]);
 
-  useEffect(() => {
-  }, [postData])
+  // useEffect(() => {
+  // }, [postData])
   
   
   const handleUploadPost = async () => {
@@ -83,6 +83,7 @@ function CreatePostButton() {
         userUid: postData.userUid,
         userProfile: postData.userProfile,
         userName : postData.userName,
+        likes : postData.likes,
         timestamp : serverTimestamp()
       });
       
