@@ -7,7 +7,12 @@ import Home from './components/Home';
 import Profile from './components/Profile';
 // import { useAuth } from './context';
 import { doSignInWithEmailAndPassword } from './firebase/auth';
+import TimeAgo from 'javascript-time-ago'
 
+import en from 'javascript-time-ago/locale/en'
+import ru from 'javascript-time-ago/locale/ru'
+TimeAgo.addDefaultLocale(en)
+TimeAgo.addLocale(ru)
 
 
 

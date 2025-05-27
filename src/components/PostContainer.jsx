@@ -10,29 +10,22 @@ import { useData } from "../context/fetchData";
 import CreatePostButton from "./CreatePostButton";
 import CircularProgress from '@mui/material/CircularProgress';
 import Badge from '@mui/material/Badge';
+import Likes from "./Likes";
 
 export default function PostContainer() {
   const { user,posts,customLoading } = useData(); 
+  const [postId,setPostId] = useState('')
   const [loading, setLoading] = useState(true);
-  const [likes,setLikes] = useState(0);
-  const [toggleLikes,setToggleLikes] = useState(false)
+  // const [likes,setLikes] = useState(0);
+  // const [toggleLikes,setToggleLikes] = useState(false)
+  // const [likedPostId,setLikedPostId]
 
-  useEffect(() => {
-    if (posts && posts.length > 0) {
-      setLoading(false);
-    } else if (posts && posts.length === 0) {
-      setLoading(false); 
-    }
-  }, [posts]);
-  
-  // useEffect(() => {
-  //   console.log(toggleLikes)
-  // }, [toggleLikes])
-  
-  const handleLikes = (postId)=>{
-      console.log(postId) 
-  }  
 
+const handlePostId = (postId)=>{
+
+      setPostId(postId)
+
+}
   return (
     <>
       <Grid container sx={{ width: "100%", flexDirection: "column", minHeight: "100vh", paddingTop: 10, alignItems: "center", justifyContent: "center" }}>
@@ -65,7 +58,7 @@ export default function PostContainer() {
                 </Box>
                 <Box  sx={{ display: "flex", justifyContent: "space-around", width: "100%", padding: 2 }}>
                         {/* <NotificationsIcon /> */}
-                     <Badge onClick={()=>handleLikes(post.id)} badgeContent={post.likes} color="error">
+                     <Badge onClick={()=>handlePostId(post.id)} badgeContent={post.likes} color="error">
                   <IconButton size="small">
                     <ThumbUpIcon   sx={{ color: toggleLikes ? "#1976d2" : "grey" }} fontSize="small" />
                   </IconButton>
@@ -79,6 +72,8 @@ export default function PostContainer() {
           ))
         )}
       </Grid>
+      <Likes postId={postId} />
+
       <CreatePostButton />
     </>
   );
