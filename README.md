@@ -1,6 +1,6 @@
 # Drshariqtariqi's Project
 
-This is a React + Vite application providing a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This React + Vite application provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
 
